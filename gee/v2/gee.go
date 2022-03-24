@@ -1,8 +1,8 @@
 package gee
 
 import (
-	"fmt"
 	"net/http"
+	"os"
 )
 
 // references: https://geektutu.com/post/gee-day2.html
@@ -54,21 +54,20 @@ c.JSON(http.StatusOK, gee.H{
 })
 */
 
-type HandleFunc func(http.ResponseWriter, *http.Request)
+type HandleFunc func(c *Context)
 
 // 2.实现http.Handler接口,拦截所有的HTTP请求，拥有了统一的控制入口。在这里我们可以自由定义路由映射的规则，也可以统一添加一些处理逻辑，例如日志、异常处理等。
 type Engine struct {
-	router map[string]HandleFunc
+	router *router
 }
 
 // 3.构造Engine
 func New() *Engine {
-	return &Engine{router: make(map[string]HandleFunc)}
+	return &Engine{router: newRouter()}
 }
 
 func (e *Engine) addRouter(method, pattern string, handler HandleFunc) {
-	key := method + "-" + pattern
-	e.router[key] = handler
+	e.router.addRoute(method, pattern, handler)
 }
 
 func (e *Engine) Get(pattern string, handler HandleFunc) {
@@ -79,16 +78,23 @@ func (e *Engine) Post(pattern string, handler HandleFunc) {
 	e.addRouter("POST", pattern, handler)
 }
 
-func (e *Engine) Run(addr string) error {
-	return http.ListenAndServe(addr, e)
+// default run on localhost:9999
+func (e *Engine) Run(addr ...string) error {
+	l := len(addr)
+	address := ":9999"
+	switch l {
+	case 1:
+		address = addr[0]
+	case 0:
+		if port := os.Getenv("PORT"); port != "" {
+			address = ":" + port
+		}
+	}
+	return http.ListenAndServe(address, e)
 }
 
 // 解析请求路径,查找路由映射表,执行对应的处理函数
 func (e Engine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	key := r.Method + "-" + r.URL.Path
-	if handler, ok := e.router[key]; ok {
-		handler(w, r)
-	} else {
-		fmt.Fprintf(w, "404 not found,url:%s", r.URL.Path)
-	}
+	c := newContext(w, r)
+	e.router.handle(c)
 }
