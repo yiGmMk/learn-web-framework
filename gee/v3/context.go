@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2022-04-07 20:03:07
- * @LastEditTime: 2022-04-08 15:38:22
+ * @LastEditTime: 2022-04-08 16:30:48
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: /web-frame-work/gee/v3/context.go
@@ -43,12 +43,19 @@ func newContext(w http.ResponseWriter, r *http.Request) *Context {
 	}
 }
 
+// form表单参数
 func (c *Context) PostForm(key string) string {
 	return c.Req.FormValue(key)
 }
 
+//  query参数
 func (c *Context) Query(key string) string {
 	return c.Req.URL.Query().Get(key)
+}
+
+// 路径参数
+func (c *Context) Param(key string) string {
+	return c.Params[key]
 }
 
 func (c *Context) Status(code int) {
@@ -56,10 +63,12 @@ func (c *Context) Status(code int) {
 	c.Writer.WriteHeader(code)
 }
 
+// 设置响应头
 func (c *Context) SetHeader(key string, value string) {
 	c.Writer.Header().Set(key, value)
 }
 
+// 文本响应
 func (c *Context) String(code int, format string, values ...interface{}) {
 	c.SetHeader("Content-Type", "text/plain")
 	c.Status(code)

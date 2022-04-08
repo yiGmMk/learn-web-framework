@@ -1,6 +1,7 @@
 package gee
 
 import (
+	"log"
 	"net/http"
 	"strings"
 )
@@ -81,7 +82,10 @@ func (r *router) handle(c *Context) {
 		c.String(http.StatusNotFound, "404 NOT FOUND: %s\n", c.Path)
 		return
 	}
-	key := c.Method + "-" + c.Path
+	// 动态路由这里HandleFunc映射的是的pattern不能直接使用c.Path,c.Path是请求参数,有一些是参数值
+	/* 如 /hello/:name   => /hello/gee  	 */
+	log.Printf("node.pat:%s,c.pat:%s\n", node.pattern, c.Path)
+	key := c.Method + "-" + node.pattern
 	c.Params = params
 	r.handlers[key](c)
 }
