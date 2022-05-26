@@ -15,5 +15,6 @@ func NewChiServer() {
 		w.Write([]byte("root."))
 
 	})
+
 	http.ListenAndServe(":3333", r)
 }
