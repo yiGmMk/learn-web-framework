@@ -1,10 +1,10 @@
 package routers
 
 import (
-	"bee-ocr/controllers"
 	beego "github.com/beego/beego/v2/server/web"
+	"github.com/yiGmMk/learn-web-framework/beegov2/controllers"
 )
 
 func init() {
-    beego.Router("/", &controllers.MainController{})
+	beego.Router("/", &controllers.MainController{})
 }
