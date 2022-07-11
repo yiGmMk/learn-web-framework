@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/beego/beego/v2 v2.0.3
 	github.com/gin-gonic/gin v1.7.7
+	github.com/go-chi/chi v1.5.4
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/mackerelio/go-osstat v0.2.2
